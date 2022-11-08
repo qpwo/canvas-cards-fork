@@ -2,8 +2,8 @@
 const canvas = document.getElementById('boxer');
 const context = canvas.getContext('2d');
 
-canvas.width = 300;
-canvas.height = 500;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 const width = canvas.width;
 const height = canvas.height;
@@ -11,6 +11,8 @@ const height = canvas.height;
 boxer();
 
 function boxer() {
+  const MIN = 100;
+  const MAX = 500;
 
   // Colors
   const yellow = '#FEAC00';
@@ -27,23 +29,25 @@ function boxer() {
     '#CF3B45',
   ];
 
-  const widths = [];
+  let widths = [];
   for (let w = 0; w < width;) {
-    widths.push(rangeFloor(10, 50));
+    widths.push(rangeFloor(MIN, MAX));
     w = w + widths.at(-1);
   }
 
-  const heights = [];
+  let heights = [];
   for (const _ of widths) {
     const arr = [];
     for (let h = 0; h < height;) {
-      arr.push(rangeFloor(10, 50));
+      arr.push(rangeFloor(MIN, MAX));
       h = h + arr.at(-1);
     }
     heights.push(arr);
   }
-  const hasGradient = heights.map((arr) => arr.map(() => Math.random() > 0.7));
+  const hasGradient = heights.map((arr) => arr.map(() => 1 + Math.random() > 0.7));
   const colorArrs = hasGradient.map((arr) => arr.map(has => has ? [pick(colors), pick(colors)] : pick(colors)));
+  const scaleW = widths.map(() => 1 + Math.random() * .01 - .005);
+  const scaleH = heights.map((arr) => arr.map(() => 1 + Math.random() * .01 - .005));
 
   // Backgrounds
   context.fillStyle = yellow;
@@ -79,13 +83,28 @@ function boxer() {
       w += boxWidth;
     }
   }
+  function normalize() {
+    const totalW = widths.reduce((a, b) => a + b);
+    widths = widths.map(w => w * 1.1 * width / totalW);
+    for (let i = 0; i < heights.length; i++) {
+      const totalH = heights[i].reduce((a, b) => a + b);
+      heights[i] = heights[i].map(h => h * height / totalH);
+    }
+  }
   function update() {
     for (let i = 0; i < widths.length; i++) {
-      widths[i] *= (1 + Math.random() * .1 - .05);
+      widths[i] *= scaleW[i];
+      if (widths[i] < MIN || widths[i] > MAX) {
+        scaleW[i] = 2 - scaleW[i];
+      }
       for (let j = 0; j < heights[i].length; j++) {
-        heights[i][j] *= (1 + Math.random() * .1 - .05);
+        heights[i][j] *= scaleH[i][j];
+        if (heights[i][j] < MIN || heights[i][j] > MAX) {
+          scaleH[i][j] = 2 - scaleH[i][j];
+        }
       }
     }
+    normalize();
   }
   function frame() {
     update();
