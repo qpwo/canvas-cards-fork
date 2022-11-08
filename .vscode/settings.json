@@ -1,0 +1,11 @@
+{
+  "javascript.format.semicolons": "insert",
+  "typescript.format.semicolons": "insert",
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#063335",
+    "titleBar.activeBackground": "#09484A",
+    "titleBar.activeForeground": "#EEFCFD",
+    "statusBar.background": "#09484A",
+    "statusBar.foreground": "#EEFCFD"
+  }
+}
